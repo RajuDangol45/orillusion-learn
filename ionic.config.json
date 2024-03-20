@@ -1,0 +1,7 @@
+{
+  "name": "orillusion-learn",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
