@@ -12,7 +12,8 @@ import {
   MeshRenderer,
   DirectLight,
   HoverCameraController,
-  AtmosphericComponent
+  AtmosphericComponent,
+  ComponentBase
 } from '@orillusion/core';
 
 @Component({
@@ -55,6 +56,7 @@ export class HomePage implements OnInit{
 
     const obj = new Object3D();
     let mr = obj.addComponent(MeshRenderer);
+    obj.addComponent(RotateScript);
     mr.geometry = new BoxGeometry(5,5,5);
     mr.material = new LitMaterial();
 
@@ -68,5 +70,11 @@ export class HomePage implements OnInit{
     view.scene = scene;
     view.camera = camera;
     Engine3D.startRenderView(view);
+  }
+}
+
+class RotateScript extends ComponentBase {
+  override onUpdate() {
+    this.object3D.rotationY += 1;
   }
 }
