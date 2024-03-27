@@ -50,16 +50,16 @@ export class HomePage implements OnInit, AfterViewInit{
     let sky = scene.addComponent(AtmosphericComponent);
     let cameraObj = new Object3D();
     let camera = cameraObj.addComponent(Camera3D);
-    camera.perspective(60, window.innerWidth/window.innerHeight, 1, 5000);
+    camera.perspective(60, window.innerWidth/window.innerHeight, 1, 100);
     let controller = camera.object3D.addComponent(HoverCameraController);
-    controller.setCamera(0, 0, 15);
+    controller.setCamera(0, -20, 15);
     scene.addChild(cameraObj);
 
     this.light = new Object3D();
     let component = this.light.addComponent(DirectLight);
     this.light.rotationX = 45;
     this.light.rotationY = 30;
-    component.intensity = 2;
+    component.intensity = 5;
     scene.addChild(this.light);
 
     const obj = new Object3D();
