@@ -48,6 +48,7 @@ export class HomePage implements OnInit, AfterViewInit{
   play() {
     let scene = new Scene3D();
     let sky = scene.addComponent(AtmosphericComponent);
+    sky.sunBrightness = 0.2;
     let cameraObj = new Object3D();
     let camera = cameraObj.addComponent(Camera3D);
     camera.perspective(60, window.innerWidth/window.innerHeight, 1, 100);
@@ -61,6 +62,8 @@ export class HomePage implements OnInit, AfterViewInit{
     this.light.rotationY = 30;
     component.intensity = 5;
     scene.addChild(this.light);
+
+    sky.relativeTransform = component.transform;
 
     const obj = new Object3D();
     let mr = obj.addComponent(MeshRenderer);
