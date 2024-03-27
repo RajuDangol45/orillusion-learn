@@ -13,7 +13,9 @@ import {
   DirectLight,
   HoverCameraController,
   AtmosphericComponent,
-  ComponentBase
+  ComponentBase,
+  SolidColorSky,
+  SkyRenderer
 } from '@orillusion/core';
 
 @Component({
@@ -41,14 +43,23 @@ export class HomePage implements OnInit, AfterViewInit{
   async startEngine() {
     let canvas: HTMLCanvasElement = document.getElementById('canvas') as HTMLCanvasElement;
     await Engine3D.init({
-      canvasConfig: {canvas}
+      canvasConfig: {
+        canvas,
+        alpha: true
+      }
     });
   }
 
   play() {
     let scene = new Scene3D();
-    let sky = scene.addComponent(AtmosphericComponent);
-    sky.sunBrightness = 0.2;
+    // let sky = scene.addComponent(AtmosphericComponent);
+    // sky.sunBrightness = 0.2;
+    let colorSky = new SolidColorSky(new Color(0.5, 1, 0.8, 1))
+    let sky = scene.addComponent(SkyRenderer);
+    sky.map = colorSky;
+    scene.envMap = colorSky;
+    sky.enable = false;
+
     let cameraObj = new Object3D();
     let camera = cameraObj.addComponent(Camera3D);
     camera.perspective(60, window.innerWidth/window.innerHeight, 1, 100);
@@ -62,8 +73,6 @@ export class HomePage implements OnInit, AfterViewInit{
     this.light.rotationY = 30;
     component.intensity = 5;
     scene.addChild(this.light);
-
-    sky.relativeTransform = component.transform;
 
     const obj = new Object3D();
     let mr = obj.addComponent(MeshRenderer);
