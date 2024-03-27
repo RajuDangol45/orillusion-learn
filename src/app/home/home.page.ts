@@ -78,6 +78,9 @@ export class HomePage implements OnInit, AfterViewInit{
     let mr = obj.addComponent(MeshRenderer);
     mr.geometry = new BoxGeometry(5,1,4);
     mr.material = new LitMaterial();
+    obj.y = 2;
+    obj.rotationX = 10
+    obj.scaleX = 1.2
 
     scene.addChild(obj);
 
