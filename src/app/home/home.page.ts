@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { IonHeader, IonToolbar, IonTitle, IonContent } from '@ionic/angular/standalone';
+import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { IonHeader, IonToolbar, IonTitle, IonContent, IonButton } from '@ionic/angular/standalone';
 import {
   Color,
   Engine3D,
@@ -21,12 +21,17 @@ import {
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
   standalone: true,
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent],
+  imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonButton],
 })
-export class HomePage implements OnInit{
+export class HomePage implements OnInit, AfterViewInit{
+  private light!: Object3D;
   constructor() {}
 
   ngOnInit() {
+    
+  }
+
+  ngAfterViewInit(): void {
     this.startEngine().then(() => {
       const {scene, camera} = this.play();
       this.render(scene ,camera);
@@ -34,7 +39,10 @@ export class HomePage implements OnInit{
   }
 
   async startEngine() {
-    await Engine3D.init();
+    let canvas: HTMLCanvasElement = document.getElementById('canvas') as HTMLCanvasElement;
+    await Engine3D.init({
+      canvasConfig: {canvas}
+    });
   }
 
   play() {
@@ -47,17 +55,16 @@ export class HomePage implements OnInit{
     controller.setCamera(0, 0, 15);
     scene.addChild(cameraObj);
 
-    let light = new Object3D();
-    let component = light.addComponent(DirectLight);
-    light.rotationX = 45;
-    light.rotationY = 30;
+    this.light = new Object3D();
+    let component = this.light.addComponent(DirectLight);
+    this.light.rotationX = 45;
+    this.light.rotationY = 30;
     component.intensity = 2;
-    scene.addChild(light);
+    scene.addChild(this.light);
 
     const obj = new Object3D();
     let mr = obj.addComponent(MeshRenderer);
-    obj.addComponent(RotateScript);
-    mr.geometry = new BoxGeometry(5,5,5);
+    mr.geometry = new BoxGeometry(5,1,4);
     mr.material = new LitMaterial();
 
     scene.addChild(obj);
@@ -71,10 +78,9 @@ export class HomePage implements OnInit{
     view.camera = camera;
     Engine3D.startRenderView(view);
   }
-}
 
-class RotateScript extends ComponentBase {
-  override onUpdate() {
-    this.object3D.rotationY += 1;
+  toggleLight() {
+    const light = this.light.getComponent(DirectLight);
+    light.enable = !light.enable;
   }
 }
