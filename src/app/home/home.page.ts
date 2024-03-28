@@ -15,7 +15,8 @@ import {
   AtmosphericComponent,
   ComponentBase,
   SolidColorSky,
-  SkyRenderer
+  SkyRenderer,
+  Time
 } from '@orillusion/core';
 
 @Component({
@@ -73,6 +74,7 @@ export class HomePage implements OnInit, AfterViewInit{
     this.light.rotationY = 30;
     component.intensity = 5;
     scene.addChild(this.light);
+    this.light.addComponent(LightAnimation);
 
     const obj = new Object3D();
     let mr = obj.addComponent(MeshRenderer);
@@ -80,7 +82,10 @@ export class HomePage implements OnInit, AfterViewInit{
     mr.material = new LitMaterial();
     obj.y = 2;
     obj.rotationX = 10
-    obj.scaleX = 1.2
+    obj.scaleX = 1.2;
+    // obj.addComponent(Script);
+    obj.addComponent(MaterialAnimation);
+    obj.addComponent(PathAnimation);
 
     scene.addChild(obj);
 
@@ -97,5 +102,51 @@ export class HomePage implements OnInit, AfterViewInit{
   toggleLight() {
     const light = this.light.getComponent(DirectLight);
     light.enable = !light.enable;
+  }
+}
+
+class Script extends ComponentBase {
+  override start() {
+    // console.log(this.object3D);
+  }
+
+  override onUpdate() {
+    this.object3D.rotationY +=1;
+  }
+}
+
+class LightAnimation extends ComponentBase {
+  private light!: DirectLight;
+  private color!: Color;
+
+  override start() {
+    this.light = this.object3D.getComponent(DirectLight);
+    this.color = this.light.lightColor;
+  }
+
+  override onUpdate() {
+    this.color.g = Math.pow(Math.sin(Time.time * 0.001), 10);
+    this.light.lightColor = this.color;
+  }
+}
+
+class MaterialAnimation extends ComponentBase {
+  private material!: LitMaterial;
+
+  override start() {
+    let mr = this.object3D.getComponent(MeshRenderer);
+    this.material = mr.material as LitMaterial;
+  }
+
+  override onUpdate() {
+    let delta = Time.time * 0.001;
+    this.material.baseColor = new Color(Math.sin(delta), Math.cos(delta), Math.sin(delta));
+  }
+}
+
+class PathAnimation extends ComponentBase {
+  override onUpdate() {
+    this.object3D.x = Math.sin(Time.time * 0.001) * 2;
+    this.object3D.y = Math.cos(Time.time * 0.001) * 2;
   }
 }
