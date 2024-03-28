@@ -28,6 +28,8 @@ import {
 })
 export class HomePage implements OnInit, AfterViewInit{
   private light!: Object3D;
+  private renderState = false;
+
   constructor() {}
 
   ngOnInit() {
@@ -42,11 +44,13 @@ export class HomePage implements OnInit, AfterViewInit{
   }
 
   async startEngine() {
+    this.configureEngine();
     let canvas: HTMLCanvasElement = document.getElementById('canvas') as HTMLCanvasElement;
     await Engine3D.init({
       canvasConfig: {
         canvas,
-        alpha: true
+        alpha: true,
+        devicePixelRatio: 1
       }
     });
   }
@@ -97,11 +101,29 @@ export class HomePage implements OnInit, AfterViewInit{
     view.scene = scene;
     view.camera = camera;
     Engine3D.startRenderView(view);
+    this.renderState = true;
   }
 
   toggleLight() {
     const light = this.light.getComponent(DirectLight);
     light.enable = !light.enable;
+  }
+
+  toggleRendering() {
+    if (this.renderState) {
+      Engine3D.pause();
+    } else {
+      Engine3D.resume();
+    }
+    this.renderState = !this.renderState;
+  }
+
+  configureEngine() {
+    Engine3D.setting.light.maxLight = 1024;
+    Engine3D.setting.render.useLogDepth = true;
+    Engine3D.setting.pick.enable = true;
+    Engine3D.setting.pick.mode = 'pixel';
+   Engine3D.setting.shadow.enable = true;
   }
 }
 

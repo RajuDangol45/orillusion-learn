@@ -1,5 +1,8 @@
 
 <ion-content [fullscreen]="true">
   <canvas id="canvas" width="200" height="200" ></canvas>
-  <ion-button (click)="toggleLight()">Toggle light</ion-button>
+  <div class="buttons">
+    <ion-button (click)="toggleLight()">Toggle light</ion-button>
+    <ion-button (click)="toggleRendering()">Pause/Play</ion-button>
+  </div>
 </ion-content>
