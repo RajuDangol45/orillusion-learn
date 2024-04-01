@@ -1,5 +1,11 @@
 import { AfterViewInit, Component, OnInit } from '@angular/core';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonButton } from '@ionic/angular/standalone';
+import {
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonContent,
+  IonButton,
+} from '@ionic/angular/standalone';
 import {
   Color,
   Engine3D,
@@ -16,7 +22,10 @@ import {
   ComponentBase,
   SolidColorSky,
   SkyRenderer,
-  Time
+  Time,
+  Vector3,
+  FlyCameraController,
+  OrbitController,
 } from '@orillusion/core';
 
 @Component({
@@ -26,32 +35,32 @@ import {
   standalone: true,
   imports: [IonHeader, IonToolbar, IonTitle, IonContent, IonButton],
 })
-export class HomePage implements OnInit, AfterViewInit{
+export class HomePage implements OnInit, AfterViewInit {
   private light!: Object3D;
   private renderState = false;
 
   constructor() {}
 
-  ngOnInit() {
-    
-  }
+  ngOnInit() {}
 
   ngAfterViewInit(): void {
     this.startEngine().then(() => {
-      const {scene, camera} = this.play();
-      this.render(scene ,camera);
+      const { scene, camera } = this.play();
+      this.render(scene, camera);
     });
   }
 
   async startEngine() {
     this.configureEngine();
-    let canvas: HTMLCanvasElement = document.getElementById('canvas') as HTMLCanvasElement;
+    let canvas: HTMLCanvasElement = document.getElementById(
+      'canvas'
+    ) as HTMLCanvasElement;
     await Engine3D.init({
       canvasConfig: {
         canvas,
-        alpha: true,
-        devicePixelRatio: 1
-      }
+        // alpha: true,
+        devicePixelRatio: 1,
+      },
     });
   }
 
@@ -59,7 +68,7 @@ export class HomePage implements OnInit, AfterViewInit{
     let scene = new Scene3D();
     // let sky = scene.addComponent(AtmosphericComponent);
     // sky.sunBrightness = 0.2;
-    let colorSky = new SolidColorSky(new Color(0.5, 1, 0.8, 1))
+    let colorSky = new SolidColorSky(new Color(0.5, 1, 0.8, 1));
     let sky = scene.addComponent(SkyRenderer);
     sky.map = colorSky;
     scene.envMap = colorSky;
@@ -67,9 +76,24 @@ export class HomePage implements OnInit, AfterViewInit{
 
     let cameraObj = new Object3D();
     let camera = cameraObj.addComponent(Camera3D);
-    camera.perspective(60, window.innerWidth/window.innerHeight, 1, 100);
+
+    camera.perspective(60, window.innerWidth / window.innerHeight, 1, 100);
+    // camera.orthoOffCenter(400, 400, 400 , 400, 20, 20);
+
     let controller = camera.object3D.addComponent(HoverCameraController);
     controller.setCamera(0, -20, 15);
+    // let controller = camera.object3D.addComponent(FlyCameraController);
+    // controller.setCamera(new Vector3(0, 0, 15), new Vector3(0, 0, 0));
+    // let controller = camera.object3D.addComponent(OrbitController);
+    // cameraObj.localPosition.set(0, 10, 10);
+    // controller.autoRotate = true;
+    // controller.autoRotateSpeed = 1;
+
+    // cameraObj.z = -20;
+    // cameraObj.y = 10;
+    // cameraObj.rotationX = 30;
+
+    // camera.lookAt(new Vector3(10, 0, -60), new Vector3(0, 0,0), new Vector3(0, 0,1));
     scene.addChild(cameraObj);
 
     this.light = new Object3D();
@@ -82,22 +106,22 @@ export class HomePage implements OnInit, AfterViewInit{
 
     const obj = new Object3D();
     let mr = obj.addComponent(MeshRenderer);
-    mr.geometry = new BoxGeometry(5,1,4);
+    mr.geometry = new BoxGeometry(5, 1, 4);
     mr.material = new LitMaterial();
     obj.y = 2;
-    obj.rotationX = 10
+    obj.rotationX = 10;
     obj.scaleX = 1.2;
     // obj.addComponent(Script);
     obj.addComponent(MaterialAnimation);
-    obj.addComponent(PathAnimation);
+    // obj.addComponent(PathAnimation);
 
     scene.addChild(obj);
 
-    return {scene, camera};
+    return { scene, camera };
   }
 
   render(scene: Scene3D, camera: Camera3D) {
-    let view  = new View3D();
+    let view = new View3D();
     view.scene = scene;
     view.camera = camera;
     Engine3D.startRenderView(view);
@@ -123,7 +147,7 @@ export class HomePage implements OnInit, AfterViewInit{
     Engine3D.setting.render.useLogDepth = true;
     Engine3D.setting.pick.enable = true;
     Engine3D.setting.pick.mode = 'pixel';
-   Engine3D.setting.shadow.enable = true;
+    Engine3D.setting.shadow.enable = true;
   }
 }
 
@@ -133,7 +157,7 @@ class Script extends ComponentBase {
   }
 
   override onUpdate() {
-    this.object3D.rotationY +=1;
+    this.object3D.rotationY += 1;
   }
 }
 
@@ -162,7 +186,11 @@ class MaterialAnimation extends ComponentBase {
 
   override onUpdate() {
     let delta = Time.time * 0.001;
-    this.material.baseColor = new Color(Math.sin(delta), Math.cos(delta), Math.sin(delta));
+    this.material.baseColor = new Color(
+      Math.sin(delta),
+      Math.cos(delta),
+      Math.sin(delta)
+    );
   }
 }
 
